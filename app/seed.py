@@ -1,6 +1,7 @@
 from models import Vendor, Sweet, Vendor_Sweets
 from app import app, db
 
+
 def seed_data():
 
     vendors = [

@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship, validates
 from random import choices, randint
 from datetime import datetime
 
+
 db = SQLAlchemy()
 
 class Vendor(db.Model):
@@ -28,7 +29,7 @@ class Vendor_Sweets(db.Model):
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'), nullable=False) 
     created_at = db.Column(db.DateTime, default=datetime.utcnow, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, server_default=db.func.now(), onupdate=datetime.utcnow)
-    sweet = db.relationship('Sweet', back_populates='vendors')  
+    sweet = db.relationship('Sweet', back_populates='vendor')  
     vendor = db.relationship('Vendor', back_populates='sweets')
 
     @validates('price')
@@ -49,5 +50,5 @@ class Sweet(db.Model):
     name = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, server_default=db.func.now(), onupdate=datetime.utcnow)
-    vendors = db.relationship('Vendor_Sweets', back_populates='sweet')
+    vendor = db.relationship('Vendor_Sweets', back_populates='sweet')
 

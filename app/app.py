@@ -1,3 +1,4 @@
+
 from flask import Flask, make_response, jsonify, request
 from flask_migrate import Migrate
 from flask_restful import Api, Resource, reqparse
@@ -5,6 +6,8 @@ from flask_marshmallow import Marshmallow
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from models import db, Vendor, Sweet, Vendor_Sweets
 import os
+from flask_cors import CORS
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'app.db')
@@ -15,6 +18,7 @@ db.init_app(app)
 api = Api(app)
 ma = Marshmallow(app)
 ma.init_app(app)
+CORS(app)
 
 @app.route('/')
 def home():
@@ -82,9 +86,10 @@ api.add_resource(VendorsByID, '/vendor/<int:id>')
 class Sweets(Resource):
     def get(self):
         sweets = Sweet.query.all()
+        res = sweet_schema.dump(sweets,many = True)
 
         response = make_response(
-            jsonify(sweets),
+            jsonify(res),
             200
         )
         return response
@@ -92,22 +97,24 @@ class Sweets(Resource):
 api.add_resource(Sweets, '/sweets')
 
 class SweetByID(Resource):
-    def get(self,id):
-        sweets = Sweet.query.filter_by(id=id).first()
+    def get(self, id):
+        sweet = Sweet.query.filter_by(id=id).first()
 
-        if sweets is None:
+        if sweet is None:
             response = make_response(
-                jsonify({"Error":"Sweet not found"}),
+                jsonify({"Error": "Sweet not found"}),
                 404
             )
-
-            return response 
+            return response
         else:
             response = make_response(
-                jsonify(sweets),
+                jsonify(sweet_schema.dump(sweet)),
                 200
             )
+            return response
+
 api.add_resource(SweetByID, '/sweets/<int:id>')
+
 
 class vendor_sweet(Resource):
     def delete(self,id):
@@ -117,7 +124,7 @@ class vendor_sweet(Resource):
             db.session.delete(vendor_sweets)
             db.session.commit()
 
-            return {}
+            return {"message": "VendorSweet deleted successfully"}
         else:
             response = make_response(
                 jsonify({"Error":"VendorSweet not found"}),
@@ -133,7 +140,7 @@ class new_VendorSweet(Resource):
     def post(self):
         data = post_args.parse_args()
 
-        sweet = Sweet.query.get(data["sweet_id"])  
+        sweet = Sweet.query.get(data["sweets_id"])  
         vendor = Vendor.query.get(data["vendor_id"])
 
         if not (sweet and vendor):
