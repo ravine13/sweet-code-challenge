@@ -12,7 +12,7 @@ function Vendor() {
   const { id } = useParams();
 
   useEffect(() => {
-    fetch(`/vendors/${id}`).then((r) => {
+    fetch(`http://127.0.0.1:5555/vendors/${id}`).then((r) => {
       if (r.ok) {
         r.json().then((vendor) =>
           setVendor({ data: vendor, error: null, status: "resolved" })
