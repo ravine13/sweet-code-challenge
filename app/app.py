@@ -113,7 +113,7 @@ class SweetByID(Resource):
             )
             return response
 
-api.add_resource(SweetByID, '/sweets/<int:id>')
+api.add_resource(SweetByID, '/sweet/<int:id>')
 
 
 class vendor_sweet(Resource):
